@@ -10,7 +10,16 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { createDrawerNavigator, DrawerItems } from 'react-navigation-drawer';
 import { createAppContainer } from 'react-navigation';
 import { Icon } from 'react-native-elements';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import SafeAreaView from 'react-native-safe-area-view';
+import { connect } from 'react-redux';
+import { fetchCampsites, fetchComments, fetchPromotions, fetchPartners } from '../redux/ActionCreators';
+
+const mapDispatchToProps = {
+    fetchCampsites,
+    fetchComments,
+    fetchPromotions,
+    fetchPartners
+};
 
 const DirectoryNavigator = createStackNavigator(
     {
@@ -115,11 +124,13 @@ const CustomDrawerContentComponent = props => (
         <SafeAreaView
             style={styles.container}
             forceInset={{top: 'always', horizontal: 'never'}}>
-            <View style={{flex: 1}}>
-                <Image source={require('./images/logo.png')} style={styles.drawerImage} />
-            </View>
-            <View style={{flex: 2}}>
-                <Text style={styles.drawerHeaderText}>NuCamp</Text>
+            <View style={styles.drawerHeader}>
+                <View style={{flex: 1}}>
+                    <Image source={require('./images/logo.png')} style={styles.drawerImage} />
+                </View>
+                <View style={{flex: 2}}>
+                    <Text style={styles.drawerHeaderText}>NuCamp</Text>
+                </View>
             </View>
             <DrawerItems {...props} />
         </SafeAreaView>
@@ -157,27 +168,29 @@ const MainNavigator = createDrawerNavigator(
         About: { 
             screen: AboutNavigator,
             navigationOptions: {
-                drawerIcon: ({tintColor}) => {
+                drawerLabel: 'About Us',
+                drawerIcon: ({tintColor}) => (
                     <Icon
-                        name='icon-circle'
+                        name='info-circle'
                         type='font-awesome'
                         size={24}
                         color={tintColor}
                     />
-                }
+                )
             }
         },
         Contact: { 
             screen: ContactNavigator,
             navigationOptions: {
-                drawerIcon: ({tintColor}) => {
+                drawerLabel: 'Contact Us',
+                drawerIcon: ({tintColor}) => (
                     <Icon
                         name='address-card'
                         type='font-awesome'
                         size={24}
                         color={tintColor}
                     />
-                }
+                )
             }
         }
     },
@@ -190,6 +203,14 @@ const MainNavigator = createDrawerNavigator(
 const AppNavigator = createAppContainer(MainNavigator)
 
 class Main extends Component {
+
+    componentDidMount() {
+        this.props.fetchCampsites();
+        this.props.fetchComments();
+        this.props.fetchPromotions();
+        this.props.fetchPartners();
+    }
+
     render() {
         return (
             <View style={{
@@ -231,4 +252,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Main;
+export default connect(null, mapDispatchToProps)(Main);
